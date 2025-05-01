@@ -1,0 +1,83 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous Medical Coding Platform - Vivek Kumar</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Vivek Kumar</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <div class="hamburger">☰</div>
+        </nav>
+    </header>
+    <main>
+        <section class="project-detail">
+            <h1>Autonomous Medical Coding Platform</h1>
+            <p><strong>Organization:</strong> AGS Health</p>
+            <p><strong>Timeline:</strong> 2023 - Present</p>
+            <p><strong>Description:</strong> Strategized and developed an AI platform for automated coding of ICD10CM, CPT, and E&M codes, streamlining healthcare billing processes.</p>
+            <p><strong>Tools Used:</strong> AWS SageMaker, Azure Machine Learning, Python, PyTorch, MLFlow, Prefect, MySQL</p>
+            <p><strong>Modality:</strong> Text (clinical notes, medical reports)</p>
+            <p><strong>Techniques/Architectures:</strong> Transformer-based NLP (BERT, RoBERTa), multi-label classification, generative AI for data augmentation</p>
+            <p><strong>Key Contributions:</strong></p>
+            <ul>
+                <li>Designed NLP models to classify codes, achieving 75%+ accuracy across 1M+ documents annually.</li>
+                <li>Built MLOps pipelines for automated retraining, cutting deployment time by 40%.</li>
+                <li>Ensured HIPAA compliance for 10TB+ datasets, supporting scalable analytics.</li>
+            </ul>
+            <p><strong>Impact:</strong> Reduced coding time by 45%, saved $2M annually for clients, and enhanced operational efficiency.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Vivek Kumar. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
