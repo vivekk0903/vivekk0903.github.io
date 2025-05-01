@@ -1,50 +1,73 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vivek Kumar | AI Project Portfolio</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vivek Kumar - AI & ML Leader</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
-  <header class="bg-white shadow">
-    <div class="max-w-6xl mx-auto px-4 py-6">
-      <h1 class="text-3xl font-bold text-blue-600">Vivek Kumar – AI Project Portfolio</h1>
-      <p class="text-sm text-gray-600">Generative AI | NLP | Healthcare AI | MLOps</p>
-    </div>
-  </header>
-
-  <main class="max-w-6xl mx-auto px-4 py-10">
-    <section class="space-y-10">
-      <div>
-        <h2 class="text-2xl font-semibold text-gray-800 mb-2">GenAI Medical Coding Assistant</h2>
-        <p class="text-gray-700">Developed a GPT-4 and LangChain based assistant to support real-time coding decisions. Reduced coder time by 25% and improved accuracy. Integrated with AWS Bedrock and Triton for scalable deployment.</p>
-      </div>
-
-      <div>
-        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Visit Summarization Pipeline</h2>
-        <p class="text-gray-700">Built a pipeline to generate structured SOAP-style summaries from unstructured EHR text using BERT and GPT-4. Helped reduce physician documentation time by 30%.</p>
-      </div>
-
-      <div>
-        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Patient Similarity Engine</h2>
-        <p class="text-gray-700">Created an engine using ClinicalBERT and FAISS to identify similar patient cases for decision support and audit workflows. Used for case-based recommendations in clinical coding.</p>
-      </div>
-
-      <div>
-        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Autonomous Coding Platform</h2>
-        <p class="text-gray-700">Led the design and deployment of an ML-based platform for ICD-10, CPT, and E&M code prediction. Achieved over 75% accuracy across 1M+ clinical documents.</p>
-      </div>
-
-      <div>
-        <h2 class="text-2xl font-semibold text-gray-800 mb-2">NER Framework for Clinical Notes</h2>
-        <p class="text-gray-700">Developed a high-precision NER system using BioBERT to extract diagnosis, procedure, temporality, and laterality entities. Used for downstream coding and summarization tasks.</p>
-      </div>
-    </section>
-  </main>
-
-  <footer class="text-center text-sm text-gray-500 py-6">
-    &copy; 2024 Vivek Kumar. Hosted via GitHub Pages.
-  </footer>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Vivek Kumar</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <div class="hamburger">☰</div>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <h1>Vivek Kumar</h1>
+            <p>Associate Director, AI & Machine Learning</p>
+            <p>Leading innovative AI solutions with a focus on NLP, generative AI, and automation for healthcare and beyond.</p>
+            <a href="projects.html" class="btn">Explore My Projects</a>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Vivek Kumar. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
